@@ -1,0 +1,151 @@
+<!-- filename: displayStudent.html -->
+<!DOCTYPE html>
+<html>
+<head>
+<title>Display Student</title>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+
+<header>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="index2.html">Student Registry</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="nav navbar-nav">
+          <li class="nav-item btn-light">
+              <a class="nav-link" href="index2.html">Home</a>
+          </li>
+          <li class="nav-item btn-light">
+              <a class="nav-link" href="/addStudent.html">Add</a>
+          </li>
+          <li class="nav-item btn-light">
+              <a class="nav-link" href="/updateStudent.html">Update</a>
+          </li>
+          <li class="nav-item btn-light">
+              <a class="nav-link" href="/displayStudent.html">Display</a>
+          </li>
+          <li class="nav-item btn-light">
+              <a class="nav-link" href="/searchStudent.html">Search</a>
+          </li>
+          <li class="nav-item btn-light">
+              <a class="nav-link" href="/listStudents.html">List</a>
+          </li>
+          <li class="nav-item btn-light">
+              <a class="nav-link" href="/deleteStudent.html">Delete</a>
+          </li>
+      </ul>
+    </div>
+
+    <!-- Add the search bar to the right side of the navbar -->
+    <form class="form-inline my-2 my-lg-0">
+      <input id="lastN" class="form-control mr-sm-2" type="search" placeholder="Search Last Name" aria-label="Search">
+      <button class="btn btn-outline-success my-2 my-sm-0" type ="button" onclick="searchGetStudentLname()">Search</button>
+    </form>
+  </nav>
+</header>
+
+<body>
+
+  <label for="id">Student ID:</label>
+  <input type="text" id="id" name="id"><br><br>
+
+  <button onclick="sendGetStudent()">Submit</button>
+  <br>
+  <br>
+  <div id="mydiv" name="mydiv"></div>
+  <script>
+
+    function displayStudentsAsTable(students) {
+      var resultHtml = '<table class="table">';
+      resultHtml += '<tr><th>ID</th><th>Name</th><th>GPA</th><th>Enrolled</th></tr>';
+
+      if (Array.isArray(students) && students.length > 0) {
+        students.forEach(function (student) {
+          resultHtml += '<tr>';
+          resultHtml += '<td>' + student.record_id + '</td>';
+          resultHtml += '<td>' + student.first_name + ' ' + student.last_name + '</td>';
+          resultHtml += '<td>' + student.gpa + '</td>';
+          resultHtml += '<td>' + student.enrolled + '</td>';
+          resultHtml += '</tr>';
+        });
+      } else if (students) { // Handle a single student
+        resultHtml += '<tr>';
+        resultHtml += '<td>' + students.record_id + '</td>';
+        resultHtml += '<td>' + students.first_name + ' ' + students.last_name + '</td>';
+        resultHtml += '<td>' + students.gpa + '</td>';
+        resultHtml += '<td>' + students.enrolled + '</td>';
+        resultHtml += '</tr>';
+      } else {
+        resultHtml += '<tr><td colspan="4">No students found.</td></tr>';
+      }
+
+      resultHtml += '</table>';
+      return resultHtml;
+    }
+
+
+    function sendGetStudent() {
+      var record_id = $("#id").val();
+      $.ajax({
+        url: "/students/" + record_id,
+        type: "get",
+        dataType: "json",
+        success: function(response) {
+          var resultHtml = '<div class="container mt-5"><div class="row justify-content-center"><div class="col-md-6"><h1>Student Information</h1>';
+      
+          // Call the displayStudentAsTable function to generate an HTML table
+          resultHtml += displayStudentsAsTable(response);
+
+          resultHtml += '</div></div></div>';
+          // Display the result HTML in the 'mydiv' element
+          $("#mydiv").html(resultHtml);
+        },
+        error: function(xhr) {
+          $("#mydiv").text('error: ' + xhr.responseText);
+        }
+      });
+    }
+
+
+    function searchGetStudentLname() {
+      var lastName = $("#lastN").val();
+      
+      $.ajax({
+        url: "/students/search/" + lastName,
+        type: "get",
+        dataType: "json",
+        success: function(response) {
+          var resultHtml = '<div class="container mt-5"><div class="row justify-content-center"><div class="col-md-6"><h1>Student Information</h1>';
+      
+      // Call the displayObjectAsHtml function to recursively generate HTML
+      resultHtml += displayStudentsAsTable(response.students);
+
+      resultHtml += '</div></div></div>';
+
+      // Display the result HTML in the 'mydiv' element
+      $("#mydiv").html(resultHtml);
+    
+        },
+        error: function(xhr) {
+          $("#mydiv").text('error: ' + xhr.responseText);
+        }
+      });
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script>
+      // Add the "active" class to the currently selected nav item based on the URL
+      $(document).ready(function () {
+          var currentUrl = window.location.href;
+          $('.nav-item').removeClass('active');
+          $('.nav-item a').filter(function () {
+              return this.href === currentUrl;
+          }).closest('.nav-item').addClass('active');
+      });
+  </script>
+</body>
+</html>

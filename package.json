@@ -5,9 +5,11 @@
   "main": "studentserver.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node studentserver.js"
+    "start": "node studentserver.js",
+    "build": "azure"
   },
   "dependencies": {
+    "azure": "^2.3.1-preview",
     "body-parser": "^1.20.2",
     "express": "^4.18.2",
     "fs": "^0.0.1-security",
